@@ -1,0 +1,2628 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>网站主题选择器 - 专业版</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --primary-color: #667eea;
+            --secondary-color: #764ba2;
+            --background-gradient: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            --card-background: rgba(255, 255, 255, 0.95);
+            --text-color: #333;
+            --border-color: #e0e0e0;
+            --shadow-color: rgba(0, 0, 0, 0.1);
+            --success-color: #4CAF50;
+            --warning-color: #FF9800;
+            --error-color: #F44336;
+            --info-color: #2196F3;
+        }
+
+        /* Theme card isolated CSS variables */
+        .theme-card {
+            --theme-card-primary: inherit;
+            --theme-card-secondary: inherit;
+            --theme-card-background: inherit;
+            --theme-card-text: inherit;
+            --theme-card-border: inherit;
+            --theme-card-shadow: inherit;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+            background: var(--background-gradient);
+            min-height: 100vh;
+            color: var(--text-color);
+            overflow-x: hidden;
+            transition: all 0.3s ease;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 40px;
+            color: white;
+            position: relative;
+        }
+
+        .header h1 {
+            font-size: 2.8rem;
+            margin-bottom: 10px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+            font-weight: 700;
+        }
+
+        .header .subtitle {
+            font-size: 1.2rem;
+            opacity: 0.9;
+            margin-bottom: 20px;
+        }
+
+        .control-panel {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            margin-bottom: 30px;
+            flex-wrap: wrap;
+        }
+
+        .control-btn {
+            background: rgba(255, 255, 255, 0.2);
+            color: white;
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            padding: 10px 20px;
+            border-radius: 25px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-size: 14px;
+            font-weight: 500;
+            backdrop-filter: blur(10px);
+        }
+
+        .control-btn:hover {
+            background: rgba(255, 255, 255, 0.3);
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+        }
+
+        .control-btn.active {
+            background: var(--success-color);
+            border-color: var(--success-color);
+        }
+
+        .theme-filter {
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+            margin-bottom: 30px;
+            flex-wrap: wrap;
+        }
+
+        .filter-btn {
+            background: rgba(255, 255, 255, 0.15);
+            color: white;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            padding: 8px 16px;
+            border-radius: 20px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-size: 13px;
+            backdrop-filter: blur(5px);
+        }
+
+        .filter-btn:hover, .filter-btn.active {
+            background: rgba(255, 255, 255, 0.25);
+            border-color: rgba(255, 255, 255, 0.4);
+        }
+
+        .theme-selector {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 25px;
+            margin-bottom: 40px;
+        }
+
+        .theme-section {
+            margin-bottom: 50px;
+        }
+
+        .section-title {
+            text-align: center;
+            color: white;
+            font-size: 1.8rem;
+            margin-bottom: 30px;
+            font-weight: 600;
+            text-shadow: 1px 1px 3px rgba(0,0,0,0.3);
+        }
+
+        .theme-card {
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 15px;
+            overflow: hidden;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+            transition: all 0.3s ease;
+            cursor: pointer;
+            position: relative;
+            backdrop-filter: blur(10px);
+            border: 1px solid #e0e0e0;
+            /* Isolate theme cards from global CSS variables */
+            isolation: isolate;
+        }
+
+        .theme-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 15px 40px rgba(0,0,0,0.2);
+        }
+
+        .theme-card.active {
+            border: 3px solid var(--success-color);
+            transform: scale(1.02);
+        }
+
+        .theme-preview {
+            height: 200px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .theme-preview .preview-header {
+            height: 40px;
+            display: flex;
+            align-items: center;
+            padding: 0 15px;
+            color: white;
+            font-weight: bold;
+            font-size: 14px;
+        }
+
+        .theme-preview .preview-content {
+            height: 120px;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .theme-preview .preview-footer {
+            height: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 12px;
+        }
+
+        .preview-button {
+            padding: 8px 16px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 12px;
+            font-weight: bold;
+            transition: all 0.2s ease;
+        }
+
+        .theme-info {
+            padding: 20px;
+        }
+
+        .theme-name {
+            font-size: 1.3rem;
+            font-weight: bold;
+            margin-bottom: 8px;
+            color: #333;
+        }
+
+        .theme-description {
+            color: #666;
+            font-size: 0.9rem;
+            line-height: 1.5;
+            margin-bottom: 15px;
+        }
+
+        .theme-tags {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+        }
+
+        .theme-tag {
+            background: #e0e0e0;
+            color: #666;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: 500;
+        }
+
+        .theme-actions {
+            display: flex;
+            gap: 10px;
+            margin-top: 15px;
+        }
+
+        .action-btn {
+            flex: 1;
+            padding: 8px 12px;
+            border: 1px solid #e0e0e0;
+            border-radius: 5px;
+            background: transparent;
+            color: #333;
+            cursor: pointer;
+            font-size: 12px;
+            transition: all 0.2s ease;
+        }
+
+        .action-btn:hover {
+            background: #667eea;
+            color: white;
+            border-color: #667eea;
+        }
+
+        .action-btn.primary {
+            background: #667eea;
+            color: white;
+            border-color: #667eea;
+        }
+
+        .action-btn.primary:hover {
+            background: #764ba2;
+            border-color: #764ba2;
+        }
+
+        .theme-stats {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-top: 10px;
+            padding-top: 10px;
+            border-top: 1px solid #e0e0e0;
+            font-size: 0.8rem;
+            color: #666;
+        }
+
+        .theme-rating {
+            display: flex;
+            gap: 2px;
+        }
+
+        .star {
+            color: #FFD700;
+        }
+
+        .demo-area {
+            background: white;
+            border-radius: 15px;
+            padding: 40px;
+            margin-top: 40px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+            transition: all 0.3s ease;
+        }
+
+        .demo-header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .demo-content {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+        }
+
+        .demo-card {
+            border-radius: 10px;
+            padding: 20px;
+            transition: all 0.3s ease;
+        }
+
+        .demo-card h3 {
+            margin-bottom: 10px;
+            font-size: 1.1rem;
+        }
+
+        .demo-card p {
+            font-size: 0.9rem;
+            line-height: 1.5;
+            opacity: 0.8;
+        }
+
+        .demo-button {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-weight: bold;
+            margin-top: 10px;
+            transition: all 0.2s ease;
+        }
+
+        .demo-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+        }
+
+        /* 主题样式 */
+        .theme-modern .preview-header {
+            background: linear-gradient(90deg, #2196F3, #21CBF3);
+        }
+
+        .theme-modern .preview-content {
+            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+            color: #333;
+        }
+
+        .theme-modern .preview-footer {
+            background: #2196F3;
+        }
+
+        .theme-modern .preview-button {
+            background: #2196F3;
+            color: white;
+        }
+
+        .theme-elegant .preview-header {
+            background: linear-gradient(90deg, #8B4513, #D2691E);
+        }
+
+        .theme-elegant .preview-content {
+            background: linear-gradient(135deg, #FFF8DC 0%, #F0E68C 100%);
+            color: #4A4A4A;
+        }
+
+        .theme-elegant .preview-footer {
+            background: #8B4513;
+        }
+
+        .theme-elegant .preview-button {
+            background: #8B4513;
+            color: white;
+        }
+
+        .theme-dark .preview-header {
+            background: linear-gradient(90deg, #2C3E50, #34495E);
+        }
+
+        .theme-dark .preview-content {
+            background: linear-gradient(135deg, #2C3E50 0%, #34495E 100%);
+            color: #ECF0F1;
+        }
+
+        .theme-dark .preview-footer {
+            background: #1A252F;
+        }
+
+        .theme-dark .preview-button {
+            background: #E74C3C;
+            color: white;
+        }
+
+        .theme-nature .preview-header {
+            background: linear-gradient(90deg, #27AE60, #2ECC71);
+        }
+
+        .theme-nature .preview-content {
+            background: linear-gradient(135deg, #A8E6CF 0%, #DCEDC1 100%);
+            color: #2C3E50;
+        }
+
+        .theme-nature .preview-footer {
+            background: #27AE60;
+        }
+
+        .theme-nature .preview-button {
+            background: #27AE60;
+            color: white;
+        }
+
+        .theme-sunset .preview-header {
+            background: linear-gradient(90deg, #FF6B6B, #FFE66D);
+        }
+
+        .theme-sunset .preview-content {
+            background: linear-gradient(135deg, #FFE5B4 0%, #FFCCBA 100%);
+            color: #4A4A4A;
+        }
+
+        .theme-sunset .preview-footer {
+            background: #FF6B6B;
+        }
+
+        .theme-sunset .preview-button {
+            background: #FF6B6B;
+            color: white;
+        }
+
+        .theme-ocean .preview-header {
+            background: linear-gradient(90deg, #667eea, #764ba2);
+        }
+
+        .theme-ocean .preview-content {
+            background: linear-gradient(135deg, #a8edea 0%, #fed6e3 100%);
+            color: #4A4A4A;
+        }
+
+        .theme-ocean .preview-footer {
+            background: #667eea;
+        }
+
+        .theme-ocean .preview-button {
+            background: #667eea;
+            color: white;
+        }
+
+        /* 新增主题样式 */
+        .theme-royal .preview-header {
+            background: linear-gradient(90deg, #FFD700, #FFA500);
+        }
+
+        .theme-royal .preview-content {
+            background: linear-gradient(135deg, #FFF8DC 0%, #F0E68C 100%);
+            color: #4A4A4A;
+        }
+
+        .theme-royal .preview-footer {
+            background: #FFD700;
+        }
+
+        .theme-royal .preview-button {
+            background: #FFD700;
+            color: #4A4A4A;
+        }
+
+        .theme-neon .preview-header {
+            background: linear-gradient(90deg, #FF0080, #0080FF);
+        }
+
+        .theme-neon .preview-content {
+            background: linear-gradient(135deg, #0F0F23 0%, #1A1A2E 100%);
+            color: #00FF88;
+        }
+
+        .theme-neon .preview-footer {
+            background: #FF0080;
+        }
+
+        .theme-neon .preview-button {
+            background: #FF0080;
+            color: white;
+        }
+
+        .theme-minimal .preview-header {
+            background: linear-gradient(90deg, #2C2C2C, #4A4A4A);
+        }
+
+        .theme-minimal .preview-content {
+            background: linear-gradient(135deg, #FFFFFF 0%, #F8F8F8 100%);
+            color: #2C2C2C;
+        }
+
+        .theme-minimal .preview-footer {
+            background: #2C2C2C;
+        }
+
+        .theme-minimal .preview-button {
+            background: #2C2C2C;
+            color: white;
+        }
+
+        .theme-vintage .preview-header {
+            background: linear-gradient(90deg, #8B4513, #A0522D);
+        }
+
+        .theme-vintage .preview-content {
+            background: linear-gradient(135deg, #DEB887 0%, #D2691E 100%);
+            color: #4A4A4A;
+        }
+
+        .theme-vintage .preview-footer {
+            background: #8B4513;
+        }
+
+        .theme-vintage .preview-button {
+            background: #8B4513;
+            color: white;
+        }
+
+        .theme-cyber .preview-header {
+            background: linear-gradient(90deg, #00D4FF, #FF0080);
+        }
+
+        .theme-cyber .preview-content {
+            background: linear-gradient(135deg, #0A0A0A 0%, #1A0033 100%);
+            color: #00D4FF;
+        }
+
+        .theme-cyber .preview-footer {
+            background: #00D4FF;
+        }
+
+        .theme-cyber .preview-button {
+            background: #00D4FF;
+            color: #0A0A0A;
+        }
+
+        .theme-forest .preview-header {
+            background: linear-gradient(90deg, #228B22, #32CD32);
+        }
+
+        .theme-forest .preview-content {
+            background: linear-gradient(135deg, #0F4C0F 0%, #228B22 100%);
+            color: #90EE90;
+        }
+
+        .theme-forest .preview-footer {
+            background: #228B22;
+        }
+
+        .theme-forest .preview-button {
+            background: #228B22;
+            color: white;
+        }
+
+        /* 演示区域主题样式 */
+        .demo-modern {
+            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+        }
+
+        .demo-modern .demo-card {
+            background: white;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        }
+
+        .demo-modern .demo-card h3 {
+            color: #2196F3;
+        }
+
+        .demo-modern .demo-button {
+            background: #2196F3;
+            color: white;
+        }
+
+        .demo-elegant {
+            background: linear-gradient(135deg, #FFF8DC 0%, #F0E68C 100%);
+        }
+
+        .demo-elegant .demo-card {
+            background: rgba(255, 248, 220, 0.8);
+            border: 2px solid #D2691E;
+        }
+
+        .demo-elegant .demo-card h3 {
+            color: #8B4513;
+        }
+
+        .demo-elegant .demo-button {
+            background: #8B4513;
+            color: white;
+        }
+
+        .demo-dark {
+            background: linear-gradient(135deg, #2C3E50 0%, #34495E 100%);
+        }
+
+        .demo-dark .demo-card {
+            background: rgba(52, 73, 94, 0.8);
+            border: 1px solid #7F8C8D;
+        }
+
+        .demo-dark .demo-card h3 {
+            color: #ECF0F1;
+        }
+
+        .demo-dark .demo-card p {
+            color: #BDC3C7;
+        }
+
+        .demo-dark .demo-button {
+            background: #E74C3C;
+            color: white;
+        }
+
+        .demo-nature {
+            background: linear-gradient(135deg, #A8E6CF 0%, #DCEDC1 100%);
+        }
+
+        .demo-nature .demo-card {
+            background: rgba(255, 255, 255, 0.8);
+            border: 1px solid #27AE60;
+        }
+
+        .demo-nature .demo-card h3 {
+            color: #27AE60;
+        }
+
+        .demo-nature .demo-button {
+            background: #27AE60;
+            color: white;
+        }
+
+        .demo-sunset {
+            background: linear-gradient(135deg, #FFE5B4 0%, #FFCCBA 100%);
+        }
+
+        .demo-sunset .demo-card {
+            background: rgba(255, 255, 255, 0.8);
+            border: 1px solid #FF6B6B;
+        }
+
+        .demo-sunset .demo-card h3 {
+            color: #FF6B6B;
+        }
+
+        .demo-sunset .demo-button {
+            background: #FF6B6B;
+            color: white;
+        }
+
+        .demo-ocean {
+            background: linear-gradient(135deg, #a8edea 0%, #fed6e3 100%);
+        }
+
+        .demo-ocean .demo-card {
+            background: rgba(255, 255, 255, 0.8);
+            border: 1px solid #667eea;
+        }
+
+        .demo-ocean .demo-card h3 {
+            color: #667eea;
+        }
+
+        .demo-ocean .demo-button {
+            background: #667eea;
+            color: white;
+        }
+
+        /* 新增演示主题样式 */
+        .demo-royal {
+            background: linear-gradient(135deg, #FFF8DC 0%, #F0E68C 100%);
+        }
+
+        .demo-royal .demo-card {
+            background: rgba(255, 248, 220, 0.8);
+            border: 2px solid #FFD700;
+        }
+
+        .demo-royal .demo-card h3 {
+            color: #B8860B;
+        }
+
+        .demo-royal .demo-button {
+            background: #FFD700;
+            color: #4A4A4A;
+        }
+
+        .demo-neon {
+            background: linear-gradient(135deg, #0F0F23 0%, #1A1A2E 100%);
+        }
+
+        .demo-neon .demo-card {
+            background: rgba(26, 26, 46, 0.8);
+            border: 1px solid #FF0080;
+            box-shadow: 0 0 20px rgba(255, 0, 128, 0.3);
+        }
+
+        .demo-neon .demo-card h3 {
+            color: #00FF88;
+            text-shadow: 0 0 10px rgba(0, 255, 136, 0.5);
+        }
+
+        .demo-neon .demo-card p {
+            color: #B0B0B0;
+        }
+
+        .demo-neon .demo-button {
+            background: #FF0080;
+            color: white;
+            box-shadow: 0 0 10px rgba(255, 0, 128, 0.5);
+        }
+
+        .demo-minimal {
+            background: linear-gradient(135deg, #FFFFFF 0%, #F8F8F8 100%);
+        }
+
+        .demo-minimal .demo-card {
+            background: white;
+            border: 1px solid #E0E0E0;
+            box-shadow: none;
+        }
+
+        .demo-minimal .demo-card h3 {
+            color: #2C2C2C;
+        }
+
+        .demo-minimal .demo-button {
+            background: #2C2C2C;
+            color: white;
+        }
+
+        .demo-vintage {
+            background: linear-gradient(135deg, #DEB887 0%, #D2691E 100%);
+        }
+
+        .demo-vintage .demo-card {
+            background: rgba(222, 184, 135, 0.8);
+            border: 1px solid #8B4513;
+        }
+
+        .demo-vintage .demo-card h3 {
+            color: #8B4513;
+        }
+
+        .demo-vintage .demo-button {
+            background: #8B4513;
+            color: white;
+        }
+
+        .demo-cyber {
+            background: linear-gradient(135deg, #0A0A0A 0%, #1A0033 100%);
+        }
+
+        .demo-cyber .demo-card {
+            background: rgba(26, 0, 51, 0.8);
+            border: 1px solid #00D4FF;
+            box-shadow: 0 0 15px rgba(0, 212, 255, 0.3);
+        }
+
+        .demo-cyber .demo-card h3 {
+            color: #00D4FF;
+            text-shadow: 0 0 8px rgba(0, 212, 255, 0.6);
+        }
+
+        .demo-cyber .demo-card p {
+            color: #B0B0B0;
+        }
+
+        .demo-cyber .demo-button {
+            background: #00D4FF;
+            color: #0A0A0A;
+        }
+
+        .demo-forest {
+            background: linear-gradient(135deg, #0F4C0F 0%, #228B22 100%);
+        }
+
+        .demo-forest .demo-card {
+            background: rgba(34, 139, 34, 0.8);
+            border: 1px solid #90EE90;
+        }
+
+        .demo-forest .demo-card h3 {
+            color: #90EE90;
+        }
+
+        .demo-forest .demo-card p {
+            color: #B0FFB0;
+        }
+
+        .demo-forest .demo-button {
+            background: #228B22;
+            color: white;
+        }
+
+        /* 完整页面主题样式 */
+        body.page-theme-modern {
+            --primary-color: #2196F3;
+            --secondary-color: #21CBF3;
+            --background-gradient: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            --card-background: rgba(255, 255, 255, 0.95);
+            --text-color: #333;
+            --border-color: #e0e0e0;
+            --shadow-color: rgba(0, 0, 0, 0.1);
+        }
+
+        body.page-theme-elegant {
+            --primary-color: #8B4513;
+            --secondary-color: #D2691E;
+            --background-gradient: linear-gradient(135deg, #8B4513 0%, #D2691E 100%);
+            --card-background: rgba(255, 248, 220, 0.95);
+            --text-color: #4A4A4A;
+            --border-color: #DEB887;
+            --shadow-color: rgba(139, 69, 19, 0.2);
+        }
+
+        body.page-theme-dark {
+            --primary-color: #3498DB;
+            --secondary-color: #E74C3C;
+            --background-gradient: linear-gradient(135deg, #2C3E50 0%, #34495E 100%);
+            --card-background: rgba(52, 73, 94, 0.9);
+            --text-color: #ECF0F1;
+            --border-color: #7F8C8D;
+            --shadow-color: rgba(0, 0, 0, 0.3);
+        }
+
+        body.page-theme-nature {
+            --primary-color: #27AE60;
+            --secondary-color: #2ECC71;
+            --background-gradient: linear-gradient(135deg, #27AE60 0%, #2ECC71 100%);
+            --card-background: rgba(255, 255, 255, 0.95);
+            --text-color: #2C3E50;
+            --border-color: #A8E6CF;
+            --shadow-color: rgba(39, 174, 96, 0.2);
+        }
+
+        body.page-theme-sunset {
+            --primary-color: #FF6B6B;
+            --secondary-color: #FFE66D;
+            --background-gradient: linear-gradient(135deg, #FF6B6B 0%, #FFE66D 100%);
+            --card-background: rgba(255, 255, 255, 0.95);
+            --text-color: #4A4A4A;
+            --border-color: #FFB6C1;
+            --shadow-color: rgba(255, 107, 107, 0.2);
+        }
+
+        body.page-theme-ocean {
+            --primary-color: #667eea;
+            --secondary-color: #764ba2;
+            --background-gradient: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            --card-background: rgba(255, 255, 255, 0.95);
+            --text-color: #333;
+            --border-color: #e0e0e0;
+            --shadow-color: rgba(0, 0, 0, 0.1);
+        }
+
+        body.page-theme-royal {
+            --primary-color: #FFD700;
+            --secondary-color: #FFA500;
+            --background-gradient: linear-gradient(135deg, #FFD700 0%, #FFA500 100%);
+            --card-background: rgba(255, 248, 220, 0.95);
+            --text-color: #4A4A4A;
+            --border-color: #FFD700;
+            --shadow-color: rgba(255, 215, 0, 0.2);
+        }
+
+        body.page-theme-neon {
+            --primary-color: #FF0080;
+            --secondary-color: #0080FF;
+            --background-gradient: linear-gradient(135deg, #FF0080 0%, #0080FF 100%);
+            --card-background: rgba(15, 15, 35, 0.9);
+            --text-color: #00FF88;
+            --border-color: #FF0080;
+            --shadow-color: rgba(255, 0, 128, 0.3);
+        }
+
+        body.page-theme-minimal {
+            --primary-color: #2C2C2C;
+            --secondary-color: #4A4A4A;
+            --background-gradient: linear-gradient(135deg, #2C2C2C 0%, #4A4A4A 100%);
+            --card-background: rgba(255, 255, 255, 0.95);
+            --text-color: #2C2C2C;
+            --border-color: #E0E0E0;
+            --shadow-color: rgba(0, 0, 0, 0.05);
+        }
+
+        body.page-theme-vintage {
+            --primary-color: #8B4513;
+            --secondary-color: #A0522D;
+            --background-gradient: linear-gradient(135deg, #8B4513 0%, #A0522D 100%);
+            --card-background: rgba(222, 184, 135, 0.9);
+            --text-color: #4A4A4A;
+            --border-color: #8B4513;
+            --shadow-color: rgba(139, 69, 19, 0.2);
+        }
+
+        body.page-theme-cyber {
+            --primary-color: #00D4FF;
+            --secondary-color: #FF0080;
+            --background-gradient: linear-gradient(135deg, #00D4FF 0%, #FF0080 100%);
+            --card-background: rgba(26, 0, 51, 0.9);
+            --text-color: #00D4FF;
+            --border-color: #00D4FF;
+            --shadow-color: rgba(0, 212, 255, 0.3);
+        }
+
+        body.page-theme-forest {
+            --primary-color: #228B22;
+            --secondary-color: #32CD32;
+            --background-gradient: linear-gradient(135deg, #228B22 0%, #32CD32 100%);
+            --card-background: rgba(34, 139, 34, 0.9);
+            --text-color: #90EE90;
+            --border-color: #90EE90;
+            --shadow-color: rgba(34, 139, 34, 0.2);
+        }
+
+        /* 自定义面板样式 */
+        .custom-panel {
+            position: fixed;
+            top: 0;
+            right: -400px;
+            width: 400px;
+            height: 100vh;
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            box-shadow: -5px 0 20px rgba(0, 0, 0, 0.1);
+            transition: right 0.3s ease;
+            z-index: 1000;
+            overflow-y: auto;
+        }
+
+        .custom-panel.open {
+            right: 0;
+        }
+
+        .custom-panel-header {
+            padding: 20px;
+            border-bottom: 1px solid #e0e0e0;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .custom-panel-content {
+            padding: 20px;
+        }
+
+        .color-picker-group {
+            margin-bottom: 20px;
+        }
+
+        .color-picker-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 500;
+        }
+
+        .color-picker {
+            width: 100%;
+            height: 40px;
+            border: 1px solid #e0e0e0;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+
+        .overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            display: none;
+            z-index: 999;
+        }
+
+        .overlay.show {
+            display: block;
+        }
+
+        .active-indicator {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            background: #4CAF50;
+            color: white;
+            padding: 5px 10px;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: bold;
+        }
+
+        .export-modal {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: white;
+            padding: 30px;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+            z-index: 1001;
+            max-width: 500px;
+            width: 90%;
+            display: none;
+        }
+
+        .export-modal.show {
+            display: block;
+        }
+
+        .export-modal h3 {
+            margin-bottom: 20px;
+            color: #333;
+        }
+
+        .export-code {
+            background: #f5f5f5;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            padding: 15px;
+            font-family: 'Courier New', monospace;
+            font-size: 12px;
+            white-space: pre-wrap;
+            max-height: 300px;
+            overflow-y: auto;
+            margin-bottom: 20px;
+        }
+
+        .modal-actions {
+            display: flex;
+            gap: 10px;
+            justify-content: flex-end;
+        }
+
+        /* 测试相关样式 */
+        .test-results-area {
+            background: white;
+            border-radius: 15px;
+            padding: 40px;
+            margin-top: 40px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+            transition: all 0.3s ease;
+        }
+
+        .test-controls {
+            display: flex;
+            gap: 10px;
+            margin: 20px 0;
+            flex-wrap: wrap;
+        }
+
+        .test-result {
+            padding: 10px;
+            margin: 10px 0;
+            border-radius: 5px;
+            font-weight: bold;
+        }
+
+        .test-pass {
+            background-color: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+
+        .test-fail {
+            background-color: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+
+        .test-info {
+            background-color: #d1ecf1;
+            color: #0c5460;
+            border: 1px solid #bee5eb;
+        }
+
+        .test-log {
+            background-color: #f8f9fa;
+            padding: 10px;
+            border-radius: 5px;
+            margin: 10px 0;
+            font-family: monospace;
+            font-size: 12px;
+            max-height: 200px;
+            overflow-y: auto;
+            border: 1px solid #dee2e6;
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                padding: 15px;
+            }
+
+            .header h1 {
+                font-size: 2rem;
+            }
+
+            .theme-selector {
+                grid-template-columns: 1fr;
+                gap: 20px;
+            }
+
+            .demo-content {
+                grid-template-columns: 1fr;
+            }
+
+            .control-panel {
+                flex-direction: column;
+                align-items: center;
+            }
+
+            .custom-panel {
+                width: 100%;
+                right: -100%;
+            }
+
+            .export-modal {
+                width: 95%;
+                padding: 20px;
+            }
+
+            .test-controls {
+                flex-direction: column;
+                align-items: center;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🎨 网站主题选择器 - 专业版</h1>
+            <p class="subtitle">选择您喜欢的主题风格，实时预览效果，支持自定义主题设置</p>
+
+            <div class="control-panel">
+                <button class="control-btn" id="viewToggle">📋 简洁视图</button>
+                <button class="control-btn" id="customTheme">🎨 自定义主题</button>
+                <button class="control-btn" id="exportTheme">📤 导出主题</button>
+                <button class="control-btn" id="randomTheme">🎲 随机主题</button>
+                <button class="control-btn" id="resetTheme">🔄 重置主题</button>
+                <button class="control-btn" id="testMode">🧪 测试模式</button>
+            </div>
+
+            <div class="theme-filter">
+                <button class="filter-btn active" data-filter="all">全部</button>
+                <button class="filter-btn" data-filter="popular">热门</button>
+                <button class="filter-btn" data-filter="business">商务</button>
+                <button class="filter-btn" data-filter="creative">创意</button>
+                <button class="filter-btn" data-filter="tech">科技</button>
+                <button class="filter-btn" data-filter="nature">自然</button>
+            </div>
+        </div>
+
+        <div class="theme-section">
+            <h2 class="section-title">🌟 热门主题推荐</h2>
+            <div class="theme-selector">
+                <div class="theme-card theme-modern active" data-theme="modern" data-category="popular business">
+                    <div class="active-indicator">当前主题</div>
+                    <div class="theme-preview">
+                        <div class="preview-header">现代简约</div>
+                        <div class="preview-content">
+                            <div style="font-weight: bold; font-size: 16px;">产品展示</div>
+                            <div style="font-size: 12px; opacity: 0.8;">简洁、清晰、专业的设计风格</div>
+                            <button class="preview-button">了解更多</button>
+                        </div>
+                        <div class="preview-footer">© 2024 现代风格</div>
+                    </div>
+                    <div class="theme-info">
+                        <div class="theme-name">现代简约</div>
+                        <div class="theme-description">
+                            采用蓝色系配色，简洁清晰的布局，适合企业官网、产品展示等现代网站。
+                        </div>
+                        <div class="theme-tags">
+                            <span class="theme-tag">商务</span>
+                            <span class="theme-tag">简约</span>
+                            <span class="theme-tag">专业</span>
+                        </div>
+                        <div class="theme-actions">
+                            <button class="action-btn" onclick="previewTheme('modern')">预览</button>
+                            <button class="action-btn primary" onclick="applyTheme('modern')">应用</button>
+                        </div>
+                        <div class="theme-stats">
+                            <div class="theme-rating">
+                                <span class="star">⭐</span>
+                                <span class="star">⭐</span>
+                                <span class="star">⭐</span>
+                                <span class="star">⭐</span>
+                                <span class="star">⭐</span>
+                            </div>
+                            <span>1.2k 使用</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="theme-card theme-elegant" data-theme="elegant" data-category="popular business">
+                    <div class="theme-preview">
+                        <div class="preview-header">优雅经典</div>
+                        <div class="preview-content">
+                            <div style="font-weight: bold; font-size: 16px;">经典设计</div>
+                            <div style="font-size: 12px; opacity: 0.8;">传统、优雅、高贵的设计风格</div>
+                            <button class="preview-button">了解更多</button>
+                        </div>
+                        <div class="preview-footer">© 2024 经典风格</div>
+                    </div>
+                    <div class="theme-info">
+                        <div class="theme-name">优雅经典</div>
+                        <div class="theme-description">
+                            采用棕色系配色，优雅传统的设计，适合豪华品牌、艺术画廊等高端网站。
+                        </div>
+                        <div class="theme-tags">
+                            <span class="theme-tag">豪华</span>
+                            <span class="theme-tag">传统</span>
+                            <span class="theme-tag">优雅</span>
+                        </div>
+                        <div class="theme-actions">
+                            <button class="action-btn" onclick="previewTheme('elegant')">预览</button>
+                            <button class="action-btn primary" onclick="applyTheme('elegant')">应用</button>
+                        </div>
+                        <div class="theme-stats">
+                            <div class="theme-rating">
+                                <span class="star">⭐</span>
+                                <span class="star">⭐</span>
+                                <span class="star">⭐</span>
+                                <span class="star">⭐</span>
+                                <span class="star">☆</span>
+                            </div>
+                            <span>856 使用</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="theme-card theme-dark" data-theme="dark" data-category="popular tech">
+                    <div class="theme-preview">
+                        <div class="preview-header">深色专业</div>
+                        <div class="preview-content">
+                            <div style="font-weight: bold; font-size: 16px;">科技展示</div>
+                            <div style="font-size: 12px; opacity: 0.8;">现代、科技、专业的设计风格</div>
+                            <button class="preview-button">了解更多</button>
+                        </div>
+                        <div class="preview-footer">© 2024 深色风格</div>
+                    </div>
+                    <div class="theme-info">
+                        <div class="theme-name">深色专业</div>
+                        <div class="theme-description">
+                            采用深色系配色，现代科技感的设计，适合科技公司、游戏网站等现代网站。
+                        </div>
+                        <div class="theme-tags">
+                            <span class="theme-tag">科技</span>
+                            <span class="theme-tag">现代</span>
+                            <span class="theme-tag">专业</span>
+                        </div>
+                        <div class="theme-actions">
+                            <button class="action-btn" onclick="previewTheme('dark')">预览</button>
+                            <button class="action-btn primary" onclick="applyTheme('dark')">应用</button>
+                        </div>
+                        <div class="theme-stats">
+                            <div class="theme-rating">
+                                <span class="star">⭐</span>
+                                <span class="star">⭐</span>
+                                <span class="star">⭐</span>
+                                <span class="star">⭐</span>
+                                <span class="star">⭐</span>
+                            </div>
+                            <span>2.1k 使用</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="theme-section">
+            <h2 class="section-title">🎨 创意主题精选</h2>
+            <div class="theme-selector">
+                <div class="theme-card theme-nature" data-theme="nature" data-category="creative nature">
+                    <div class="theme-preview">
+                        <div class="preview-header">自然清新</div>
+                        <div class="preview-content">
+                            <div style="font-weight: bold; font-size: 16px;">环保主题</div>
+                            <div style="font-size: 12px; opacity: 0.8;">清新、自然、环保的设计风格</div>
+                            <button class="preview-button">了解更多</button>
+                        </div>
+                        <div class="preview-footer">© 2024 自然风格</div>
+                    </div>
+                    <div class="theme-info">
+                        <div class="theme-name">自然清新</div>
+                        <div class="theme-description">
+                            采用绿色系配色，清新自然的设计，适合环保组织、健康产品等自然主题网站。
+                        </div>
+                        <div class="theme-tags">
+                            <span class="theme-tag">环保</span>
+                            <span class="theme-tag">清新</span>
+                            <span class="theme-tag">自然</span>
+                        </div>
+                        <div class="theme-actions">
+                            <button class="action-btn" onclick="previewTheme('nature')">预览</button>
+                            <button class="action-btn primary" onclick="applyTheme('nature')">应用</button>
+                        </div>
+                        <div class="theme-stats">
+                            <div class="theme-rating">
+                                <span class="star">⭐</span>
+                                <span class="star">⭐</span>
+                                <span class="star">⭐</span>
+                                <span class="star">⭐</span>
+                                <span class="star">☆</span>
+                            </div>
+                            <span>643 使用</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="theme-card theme-sunset" data-theme="sunset" data-category="creative">
+                    <div class="theme-preview">
+                        <div class="preview-header">夕阳温暖</div>
+                        <div class="preview-content">
+                            <div style="font-weight: bold; font-size: 16px;">温暖主题</div>
+                            <div style="font-size: 12px; opacity: 0.8;">温暖、活泼、友好的设计风格</div>
+                            <button class="preview-button">了解更多</button>
+                        </div>
+                        <div class="preview-footer">© 2024 温暖风格</div>
+                    </div>
+                    <div class="theme-info">
+                        <div class="theme-name">夕阳温暖</div>
+                        <div class="theme-description">
+                            采用橙红色系配色，温暖活泼的设计，适合社交平台、教育机构等友好型网站。
+                        </div>
+                        <div class="theme-tags">
+                            <span class="theme-tag">温暖</span>
+                            <span class="theme-tag">活泼</span>
+                            <span class="theme-tag">友好</span>
+                        </div>
+                        <div class="theme-actions">
+                            <button class="action-btn" onclick="previewTheme('sunset')">预览</button>
+                            <button class="action-btn primary" onclick="applyTheme('sunset')">应用</button>
+                        </div>
+                        <div class="theme-stats">
+                            <div class="theme-rating">
+                                <span class="star">⭐</span>
+                                <span class="star">⭐</span>
+                                <span class="star">⭐</span>
+                                <span class="star">⭐</span>
+                                <span class="star">☆</span>
+                            </div>
+                            <span>789 使用</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="theme-card theme-ocean" data-theme="ocean" data-category="creative">
+                    <div class="theme-preview">
+                        <div class="preview-header">海洋梦幻</div>
+                        <div class="preview-content">
+                            <div style="font-weight: bold; font-size: 16px;">梦幻主题</div>
+                            <div style="font-size: 12px; opacity: 0.8;">梦幻、浪漫、优雅的设计风格</div>
+                            <button class="preview-button">了解更多</button>
+                        </div>
+                        <div class="preview-footer">© 2024 海洋风格</div>
+                    </div>
+                    <div class="theme-info">
+                        <div class="theme-name">海洋梦幻</div>
+                        <div class="theme-description">
+                            采用蓝紫色系配色，梦幻优雅的设计，适合婚庆网站、创意作品等艺术性网站。
+                        </div>
+                        <div class="theme-tags">
+                            <span class="theme-tag">梦幻</span>
+                            <span class="theme-tag">浪漫</span>
+                            <span class="theme-tag">优雅</span>
+                        </div>
+                        <div class="theme-actions">
+                            <button class="action-btn" onclick="previewTheme('ocean')">预览</button>
+                            <button class="action-btn primary" onclick="applyTheme('ocean')">应用</button>
+                        </div>
+                        <div class="theme-stats">
+                            <div class="theme-rating">
+                                <span class="star">⭐</span>
+                                <span class="star">⭐</span>
+                                <span class="star">⭐</span>
+                                <span class="star">⭐</span>
+                                <span class="star">⭐</span>
+                            </div>
+                            <span>945 使用</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="theme-section">
+            <h2 class="section-title">🚀 特色主题系列</h2>
+            <div class="theme-selector">
+                <div class="theme-card theme-royal" data-theme="royal" data-category="popular creative">
+                    <div class="theme-preview">
+                        <div class="preview-header">皇家尊贵</div>
+                        <div class="preview-content">
+                            <div style="font-weight: bold; font-size: 16px;">奢华设计</div>
+                            <div style="font-size: 12px; opacity: 0.8;">尊贵、典雅、奢华的设计风格</div>
+                            <button class="preview-button">了解更多</button>
+                        </div>
+                        <div class="preview-footer">© 2024 皇家风格</div>
+                    </div>
+                    <div class="theme-info">
+                        <div class="theme-name">皇家尊贵</div>
+                        <div class="theme-description">
+                            采用金色系配色，尊贵奢华的设计，适合高端品牌、奢侈品网站等尊贵主题。
+                        </div>
+                        <div class="theme-tags">
+                            <span class="theme-tag">奢华</span>
+                            <span class="theme-tag">尊贵</span>
+                            <span class="theme-tag">典雅</span>
+                        </div>
+                        <div class="theme-actions">
+                            <button class="action-btn" onclick="previewTheme('royal')">预览</button>
+                            <button class="action-btn primary" onclick="applyTheme('royal')">应用</button>
+                        </div>
+                        <div class="theme-stats">
+                            <div class="theme-rating">
+                                <span class="star">⭐</span>
+                                <span class="star">⭐</span>
+                                <span class="star">⭐</span>
+                                <span class="star">⭐</span>
+                                <span class="star">⭐</span>
+                            </div>
+                            <span>1.5k 使用</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="theme-card theme-neon" data-theme="neon" data-category="creative tech">
+                    <div class="theme-preview">
+                        <div class="preview-header">霓虹炫彩</div>
+                        <div class="preview-content">
+                            <div style="font-weight: bold; font-size: 16px;">炫酷设计</div>
+                            <div style="font-size: 12px; opacity: 0.8;">炫酷、动感、现代的设计风格</div>
+                            <button class="preview-button">了解更多</button>
+                        </div>
+                        <div class="preview-footer">© 2024 霓虹风格</div>
+                    </div>
+                    <div class="theme-info">
+                        <div class="theme-name">霓虹炫彩</div>
+                        <div class="theme-description">
+                            采用霓虹色系配色，炫酷动感的设计，适合娱乐网站、创意作品等炫酷主题。
+                        </div>
+                        <div class="theme-tags">
+                            <span class="theme-tag">炫酷</span>
+                            <span class="theme-tag">动感</span>
+                            <span class="theme-tag">现代</span>
+                        </div>
+                        <div class="theme-actions">
+                            <button class="action-btn" onclick="previewTheme('neon')">预览</button>
+                            <button class="action-btn primary" onclick="applyTheme('neon')">应用</button>
+                        </div>
+                        <div class="theme-stats">
+                            <div class="theme-rating">
+                                <span class="star">⭐</span>
+                                <span class="star">⭐</span>
+                                <span class="star">⭐</span>
+                                <span class="star">⭐</span>
+                                <span class="star">☆</span>
+                            </div>
+                            <span>1.1k 使用</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="theme-card theme-cyber" data-theme="cyber" data-category="tech creative">
+                    <div class="theme-preview">
+                        <div class="preview-header">赛博朋克</div>
+                        <div class="preview-content">
+                            <div style="font-weight: bold; font-size: 16px;">未来设计</div>
+                            <div style="font-size: 12px; opacity: 0.8;">未来、科技、炫酷的设计风格</div>
+                            <button class="preview-button">了解更多</button>
+                        </div>
+                        <div class="preview-footer">© 2024 赛博风格</div>
+                    </div>
+                    <div class="theme-info">
+                        <div class="theme-name">赛博朋克</div>
+                        <div class="theme-description">
+                            采用赛博色系配色，未来科技感的设计，适合科技网站、游戏网站等未来主题。
+                        </div>
+                        <div class="theme-tags">
+                            <span class="theme-tag">未来</span>
+                            <span class="theme-tag">科技</span>
+                            <span class="theme-tag">炫酷</span>
+                        </div>
+                        <div class="theme-actions">
+                            <button class="action-btn" onclick="previewTheme('cyber')">预览</button>
+                            <button class="action-btn primary" onclick="applyTheme('cyber')">应用</button>
+                        </div>
+                        <div class="theme-stats">
+                            <div class="theme-rating">
+                                <span class="star">⭐</span>
+                                <span class="star">⭐</span>
+                                <span class="star">⭐</span>
+                                <span class="star">⭐</span>
+                                <span class="star">⭐</span>
+                            </div>
+                            <span>1.8k 使用</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="theme-section">
+            <h2 class="section-title">📱 经典主题</h2>
+            <div class="theme-selector">
+                <div class="theme-card theme-minimal" data-theme="minimal" data-category="popular business">
+                    <div class="theme-preview">
+                        <div class="preview-header">极简主义</div>
+                        <div class="preview-content">
+                            <div style="font-weight: bold; font-size: 16px;">简约设计</div>
+                            <div style="font-size: 12px; opacity: 0.8;">极简、纯净、高效的设计风格</div>
+                            <button class="preview-button">了解更多</button>
+                        </div>
+                        <div class="preview-footer">© 2024 极简风格</div>
+                    </div>
+                    <div class="theme-info">
+                        <div class="theme-name">极简主义</div>
+                        <div class="theme-description">
+                            采用黑白灰色系配色，极简纯净的设计，适合个人博客、作品集等简约主题。
+                        </div>
+                        <div class="theme-tags">
+                            <span class="theme-tag">极简</span>
+                            <span class="theme-tag">纯净</span>
+                            <span class="theme-tag">高效</span>
+                        </div>
+                        <div class="theme-actions">
+                            <button class="action-btn" onclick="previewTheme('minimal')">预览</button>
+                            <button class="action-btn primary" onclick="applyTheme('minimal')">应用</button>
+                        </div>
+                        <div class="theme-stats">
+                            <div class="theme-rating">
+                                <span class="star">⭐</span>
+                                <span class="star">⭐</span>
+                                <span class="star">⭐</span>
+                                <span class="star">⭐</span>
+                                <span class="star">☆</span>
+                            </div>
+                            <span>967 使用</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="theme-card theme-vintage" data-theme="vintage" data-category="creative">
+                    <div class="theme-preview">
+                        <div class="preview-header">复古怀旧</div>
+                        <div class="preview-content">
+                            <div style="font-weight: bold; font-size: 16px;">复古设计</div>
+                            <div style="font-size: 12px; opacity: 0.8;">复古、怀旧、温馨的设计风格</div>
+                            <button class="preview-button">了解更多</button>
+                        </div>
+                        <div class="preview-footer">© 2024 复古风格</div>
+                    </div>
+                    <div class="theme-info">
+                        <div class="theme-name">复古怀旧</div>
+                        <div class="theme-description">
+                            采用复古色系配色，怀旧温馨的设计，适合咖啡馆、书店等复古主题网站。
+                        </div>
+                        <div class="theme-tags">
+                            <span class="theme-tag">复古</span>
+                            <span class="theme-tag">怀旧</span>
+                            <span class="theme-tag">温馨</span>
+                        </div>
+                        <div class="theme-actions">
+                            <button class="action-btn" onclick="previewTheme('vintage')">预览</button>
+                            <button class="action-btn primary" onclick="applyTheme('vintage')">应用</button>
+                        </div>
+                        <div class="theme-stats">
+                            <div class="theme-rating">
+                                <span class="star">⭐</span>
+                                <span class="star">⭐</span>
+                                <span class="star">⭐</span>
+                                <span class="star">⭐</span>
+                                <span class="star">☆</span>
+                            </div>
+                            <span>534 使用</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="theme-card theme-forest" data-theme="forest" data-category="nature creative">
+                    <div class="theme-preview">
+                        <div class="preview-header">森林秘境</div>
+                        <div class="preview-content">
+                            <div style="font-weight: bold; font-size: 16px;">自然设计</div>
+                            <div style="font-size: 12px; opacity: 0.8;">神秘、自然、宁静的设计风格</div>
+                            <button class="preview-button">了解更多</button>
+                        </div>
+                        <div class="preview-footer">© 2024 森林风格</div>
+                    </div>
+                    <div class="theme-info">
+                        <div class="theme-name">森林秘境</div>
+                        <div class="theme-description">
+                            采用深绿色系配色，神秘宁静的设计，适合户外网站、环保组织等自然主题。
+                        </div>
+                        <div class="theme-tags">
+                            <span class="theme-tag">神秘</span>
+                            <span class="theme-tag">自然</span>
+                            <span class="theme-tag">宁静</span>
+                        </div>
+                        <div class="theme-actions">
+                            <button class="action-btn" onclick="previewTheme('forest')">预览</button>
+                            <button class="action-btn primary" onclick="applyTheme('forest')">应用</button>
+                        </div>
+                        <div class="theme-stats">
+                            <div class="theme-rating">
+                                <span class="star">⭐</span>
+                                <span class="star">⭐</span>
+                                <span class="star">⭐</span>
+                                <span class="star">⭐</span>
+                                <span class="star">☆</span>
+                            </div>
+                            <span>421 使用</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 测试结果区域 -->
+        <div class="test-results-area" id="testResultsArea" style="display: none;">
+            <div class="demo-header">
+                <h2>🧪 主题隔离测试结果</h2>
+                <p>测试主题切换是否影响其他主题卡片的样式</p>
+            </div>
+            <div class="test-controls">
+                <button class="action-btn" onclick="runThemeIsolationTest()">运行隔离测试</button>
+                <button class="action-btn" onclick="runCSSVariableTest()">运行CSS变量测试</button>
+                <button class="action-btn" onclick="runAllTests()">运行全部测试</button>
+                <button class="action-btn" onclick="clearTestResults()">清除结果</button>
+            </div>
+            <div id="testResults"></div>
+            <div class="test-log" id="testLog"></div>
+        </div>
+
+        <div class="demo-area demo-modern" id="demoArea">
+            <div class="demo-header">
+                <h2>🎭 主题预览效果</h2>
+                <p>点击上方主题卡片，实时预览不同的网站风格效果</p>
+            </div>
+            <div class="demo-content">
+                <div class="demo-card">
+                    <h3>🏢 企业展示</h3>
+                    <p>这是企业展示卡片的示例内容，展示当前主题的视觉效果和设计风格。</p>
+                    <button class="demo-button" onclick="showNotification('企业详情')">查看详情</button>
+                </div>
+                <div class="demo-card">
+                    <h3>💼 服务特色</h3>
+                    <p>这是服务特色卡片的示例内容，展示当前主题的排版和配色方案。</p>
+                    <button class="demo-button" onclick="showNotification('服务信息')">了解更多</button>
+                </div>
+                <div class="demo-card">
+                    <h3>📞 联系方式</h3>
+                    <p>这是联系方式卡片的示例内容，展示当前主题的交互效果。</p>
+                    <button class="demo-button" onclick="showNotification('联系我们')">立即联系</button>
+                </div>
+                <div class="demo-card">
+                    <h3>📰 最新动态</h3>
+                    <p>这是最新动态卡片的示例内容，展示当前主题的整体设计风格。</p>
+                    <button class="demo-button" onclick="showNotification('动态详情')">查看更多</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 自定义主题面板 -->
+    <div class="custom-panel" id="customPanel">
+        <div class="custom-panel-header">
+            <h3>🎨 自定义主题</h3>
+            <button class="action-btn" onclick="closeCustomPanel()">✕</button>
+        </div>
+        <div class="custom-panel-content">
+            <div class="color-picker-group">
+                <label>主色调</label>
+                <input type="color" class="color-picker" id="primaryColor" value="#667eea">
+            </div>
+            <div class="color-picker-group">
+                <label>辅助色</label>
+                <input type="color" class="color-picker" id="secondaryColor" value="#764ba2">
+            </div>
+            <div class="color-picker-group">
+                <label>背景色</label>
+                <input type="color" class="color-picker" id="backgroundColor" value="#667eea">
+            </div>
+            <div class="color-picker-group">
+                <label>文字色</label>
+                <input type="color" class="color-picker" id="textColor" value="#333333">
+            </div>
+            <div class="color-picker-group">
+                <label>边框色</label>
+                <input type="color" class="color-picker" id="borderColor" value="#e0e0e0">
+            </div>
+            <div class="theme-actions">
+                <button class="action-btn" onclick="resetCustomColors()">重置</button>
+                <button class="action-btn primary" onclick="applyCustomTheme()">应用主题</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- 导出主题模态框 -->
+    <div class="export-modal" id="exportModal">
+        <h3>📤 导出主题配置</h3>
+        <div class="export-code" id="exportCode"></div>
+        <div class="modal-actions">
+            <button class="action-btn" onclick="closeExportModal()">取消</button>
+            <button class="action-btn" onclick="copyThemeCode()">复制代码</button>
+            <button class="action-btn primary" onclick="downloadThemeCode()">下载文件</button>
+        </div>
+    </div>
+
+    <!-- 遮罩层 -->
+    <div class="overlay" id="overlay" onclick="closeCustomPanel()"></div>
+
+    <script>
+        class ThemeSelector {
+            constructor() {
+                this.currentTheme = 'modern';
+                this.isSimpleView = false;
+                this.customColors = {
+                    primary: '#667eea',
+                    secondary: '#764ba2',
+                    background: '#667eea',
+                    text: '#333333',
+                    border: '#e0e0e0'
+                };
+
+                // 测试功能相关属性
+                this.testResults = [];
+                this.testMode = false;
+                this.originalColors = {};
+                this.originalVariables = {};
+
+                // Event listener cleanup
+                this.eventListeners = [];
+                this.notifications = [];
+
+                this.themes = {
+                    modern: {
+                        name: '现代简约',
+                        description: '简洁专业的现代设计风格',
+                        colors: ['#2196F3', '#21CBF3', '#f5f7fa', '#c3cfe2'],
+                        features: '商务简约、专业清晰',
+                        usage: '适合企业官网、产品展示等'
+                    },
+                    elegant: {
+                        name: '优雅经典',
+                        description: '传统优雅的经典设计风格',
+                        colors: ['#8B4513', '#D2691E', '#FFF8DC', '#F0E68C'],
+                        features: '传统经典、优雅高贵',
+                        usage: '适合豪华品牌、艺术画廊等'
+                    },
+                    dark: {
+                        name: '深色专业',
+                        description: '现代科技的深色设计风格',
+                        colors: ['#2C3E50', '#34495E', '#1A252F', '#E74C3C'],
+                        features: '现代科技、深色专业',
+                        usage: '适合科技公司、游戏网站等'
+                    },
+                    nature: {
+                        name: '自然清新',
+                        description: '清新自然的环保设计风格',
+                        colors: ['#27AE60', '#2ECC71', '#A8E6CF', '#DCEDC1'],
+                        features: '清新自然、环保健康',
+                        usage: '适合环保组织、健康产品等'
+                    },
+                    sunset: {
+                        name: '夕阳温暖',
+                        description: '温暖活泼的友好设计风格',
+                        colors: ['#FF6B6B', '#FFE66D', '#FFE5B4', '#FFCCBA'],
+                        features: '温暖活泼、友好亲切',
+                        usage: '适合社交平台、教育机构等'
+                    },
+                    ocean: {
+                        name: '海洋梦幻',
+                        description: '梦幻优雅的艺术设计风格',
+                        colors: ['#667eea', '#764ba2', '#a8edea', '#fed6e3'],
+                        features: '梦幻浪漫、优雅艺术',
+                        usage: '适合婚庆网站、创意作品等'
+                    },
+                    royal: {
+                        name: '皇家尊贵',
+                        description: '尊贵奢华的设计风格',
+                        colors: ['#FFD700', '#FFA500', '#FFF8DC', '#F0E68C'],
+                        features: '尊贵奢华、典雅高贵',
+                        usage: '适合高端品牌、奢侈品网站等'
+                    },
+                    neon: {
+                        name: '霓虹炫彩',
+                        description: '炫酷动感的现代设计风格',
+                        colors: ['#FF0080', '#0080FF', '#0F0F23', '#1A1A2E'],
+                        features: '炫酷动感、现代时尚',
+                        usage: '适合娱乐网站、创意作品等'
+                    },
+                    minimal: {
+                        name: '极简主义',
+                        description: '极简纯净的设计风格',
+                        colors: ['#2C2C2C', '#4A4A4A', '#FFFFFF', '#F8F8F8'],
+                        features: '极简纯净、高效简洁',
+                        usage: '适合个人博客、作品集等'
+                    },
+                    vintage: {
+                        name: '复古怀旧',
+                        description: '怀旧温馨的设计风格',
+                        colors: ['#8B4513', '#A0522D', '#DEB887', '#D2691E'],
+                        features: '复古怀旧、温馨舒适',
+                        usage: '适合咖啡馆、书店等复古主题'
+                    },
+                    cyber: {
+                        name: '赛博朋克',
+                        description: '未来科技的设计风格',
+                        colors: ['#00D4FF', '#FF0080', '#0A0A0A', '#1A0033'],
+                        features: '未来科技、炫酷时尚',
+                        usage: '适合科技网站、游戏网站等'
+                    },
+                    forest: {
+                        name: '森林秘境',
+                        description: '神秘宁静的设计风格',
+                        colors: ['#228B22', '#32CD32', '#0F4C0F', '#228B22'],
+                        features: '神秘自然、宁静舒适',
+                        usage: '适合户外网站、环保组织等'
+                    }
+                };
+
+                this.init();
+            }
+
+            init() {
+                this.bindEvents();
+                this.loadSavedTheme();
+                this.loadCustomColors();
+            }
+
+            bindEvents() {
+                // 主题卡片点击事件
+                document.querySelectorAll('.theme-card').forEach(card => {
+                    card.addEventListener('click', (e) => {
+                        // 如果点击的是按钮，不触发主题切换
+                        if (e.target.closest('.theme-actions')) return;
+
+                        const theme = card.dataset.theme;
+                        this.switchTheme(theme);
+                    });
+                });
+
+                // 控制面板按钮事件
+                document.getElementById('viewToggle').addEventListener('click', () => this.toggleView());
+                document.getElementById('customTheme').addEventListener('click', () => this.openCustomPanel());
+                document.getElementById('exportTheme').addEventListener('click', () => this.exportTheme());
+                document.getElementById('randomTheme').addEventListener('click', () => this.randomTheme());
+                document.getElementById('resetTheme').addEventListener('click', () => this.resetTheme());
+                document.getElementById('testMode').addEventListener('click', () => this.toggleTestMode());
+
+                // 筛选按钮事件
+                document.querySelectorAll('.filter-btn').forEach(btn => {
+                    btn.addEventListener('click', (e) => {
+                        this.filterThemes(e.target.dataset.filter);
+                    });
+                });
+
+                // 颜色选择器事件
+                document.querySelectorAll('.color-picker').forEach(picker => {
+                    picker.addEventListener('input', (e) => {
+                        this.updateCustomColor(e.target.id, e.target.value);
+                    });
+                });
+            }
+
+            switchTheme(theme) {
+                if (this.currentTheme === theme) return;
+
+                // 更新当前主题
+                this.currentTheme = theme;
+
+                // 更新主题卡片状态
+                document.querySelectorAll('.theme-card').forEach(card => {
+                    card.classList.remove('active');
+                    const indicator = card.querySelector('.active-indicator');
+                    if (indicator) {
+                        indicator.remove();
+                    }
+                });
+
+                const activeCard = document.querySelector(`[data-theme="${theme}"]`);
+                if (activeCard) {
+                    activeCard.classList.add('active');
+
+                    // 添加活动指示器
+                    const indicator = document.createElement('div');
+                    indicator.className = 'active-indicator';
+                    indicator.textContent = '当前主题';
+                    activeCard.appendChild(indicator);
+                }
+
+                // 更新页面主题，仅作用于页面级（避免与卡片类名冲突）
+                document.body.className = `page-theme-${theme}`;
+
+                // 更新演示区域
+                const demoArea = document.getElementById('demoArea');
+                demoArea.className = `demo-area demo-${theme}`;
+
+                // 更新CSS变量
+                this.updateCSSVariables(theme);
+
+                // 保存主题设置
+                this.saveTheme(theme);
+
+                // 显示切换通知
+                this.showNotification(`已切换到${this.themes[theme].name}主题`, 'success');
+            }
+
+            updateCSSVariables(theme) {
+                const themeConfig = this.themes[theme];
+                if (!themeConfig) return;
+
+                // Create a style element for theme-specific variables
+                const styleId = 'theme-variables-style';
+                let styleElement = document.getElementById(styleId);
+
+                if (!styleElement) {
+                    styleElement = document.createElement('style');
+                    styleElement.id = styleId;
+                    document.head.appendChild(styleElement);
+                }
+
+                // Update global variables for main page layout
+                styleElement.textContent = `
+                    :root {
+                        --primary-color: ${themeConfig.colors[0]};
+                        --secondary-color: ${themeConfig.colors[1]};
+                        --background-gradient: linear-gradient(135deg, ${themeConfig.colors[0]} 0%, ${themeConfig.colors[1]} 100%);
+                    }
+
+                    /* Isolated theme variables for theme cards */
+                    .theme-card {
+                        --theme-card-primary: var(--primary-color);
+                        --theme-card-secondary: var(--secondary-color);
+                        --theme-card-background: var(--card-background);
+                        --theme-card-text: var(--text-color);
+                        --theme-card-border: var(--border-color);
+                        --theme-card-shadow: var(--shadow-color);
+                    }
+                `;
+
+                // Apply theme to body for main page styling (scoped class)
+                document.body.className = `page-theme-${theme}`;
+
+                // Preserve theme card styles by not affecting them with global variables
+                this.preserveThemeCardStyles();
+            }
+
+            preserveThemeCardStyles() {
+                // Theme cards are isolated through CSS classes and don't need runtime style manipulation
+                // The isolation is handled by the CSS cascade and specificity rules
+                // This method is kept for compatibility but no longer performs unnecessary DOM manipulation
+                return;
+            }
+
+            toggleView() {
+                this.isSimpleView = !this.isSimpleView;
+                const btn = document.getElementById('viewToggle');
+                const sections = document.querySelectorAll('.theme-section');
+
+                if (this.isSimpleView) {
+                    btn.textContent = '📋 详细视图';
+                    sections.forEach(section => {
+                        if (section.querySelector('.section-title').textContent !== '🌟 热门主题推荐') {
+                            section.style.display = 'none';
+                        }
+                    });
+                } else {
+                    btn.textContent = '📋 简洁视图';
+                    sections.forEach(section => {
+                        section.style.display = 'block';
+                    });
+                }
+            }
+
+            filterThemes(filter) {
+                // 更新筛选按钮状态
+                document.querySelectorAll('.filter-btn').forEach(btn => {
+                    btn.classList.remove('active');
+                });
+                document.querySelector(`[data-filter="${filter}"]`).classList.add('active');
+
+                // 筛选主题卡片
+                document.querySelectorAll('.theme-card').forEach(card => {
+                    if (filter === 'all') {
+                        card.style.display = 'block';
+                    } else {
+                        const categories = card.dataset.category ? card.dataset.category.split(' ') : [];
+                        if (categories.includes(filter)) {
+                            card.style.display = 'block';
+                        } else {
+                            card.style.display = 'none';
+                        }
+                    }
+                });
+
+                this.showNotification(`已筛选显示${this.getFilterName(filter)}主题`, 'info');
+            }
+
+            getFilterName(filter) {
+                const names = {
+                    all: '全部',
+                    popular: '热门',
+                    business: '商务',
+                    creative: '创意',
+                    tech: '科技',
+                    nature: '自然'
+                };
+                return names[filter] || '全部';
+            }
+
+            openCustomPanel() {
+                document.getElementById('customPanel').classList.add('open');
+                document.getElementById('overlay').classList.add('show');
+            }
+
+            closeCustomPanel() {
+                document.getElementById('customPanel').classList.remove('open');
+                document.getElementById('overlay').classList.remove('show');
+            }
+
+            updateCustomColor(colorId, value) {
+                this.customColors[colorId.replace('Color', '')] = value;
+            }
+
+            applyCustomTheme() {
+                const root = document.documentElement;
+                root.style.setProperty('--primary-color', this.customColors.primary);
+                root.style.setProperty('--secondary-color', this.customColors.secondary);
+                root.style.setProperty('--background-gradient', `linear-gradient(135deg, ${this.customColors.background} 0%, ${this.customColors.secondary} 100%)`);
+                root.style.setProperty('--text-color', this.customColors.text);
+                root.style.setProperty('--border-color', this.customColors.border);
+
+                this.saveCustomColors();
+                this.closeCustomPanel();
+                this.showNotification('自定义主题已应用', 'success');
+            }
+
+            resetCustomColors() {
+                this.customColors = {
+                    primary: '#667eea',
+                    secondary: '#764ba2',
+                    background: '#667eea',
+                    text: '#333333',
+                    border: '#e0e0e0'
+                };
+
+                document.getElementById('primaryColor').value = this.customColors.primary;
+                document.getElementById('secondaryColor').value = this.customColors.secondary;
+                document.getElementById('backgroundColor').value = this.customColors.background;
+                document.getElementById('textColor').value = this.customColors.text;
+                document.getElementById('borderColor').value = this.customColors.border;
+
+                this.showNotification('颜色已重置', 'info');
+            }
+
+            exportTheme() {
+                const themeData = {
+                    name: '自定义主题',
+                    description: '用户自定义的主题配置',
+                    colors: this.customColors,
+                    css: this.generateThemeCSS(),
+                    timestamp: new Date().toISOString()
+                };
+
+                const exportCode = JSON.stringify(themeData, null, 2);
+                document.getElementById('exportCode').textContent = exportCode;
+                document.getElementById('exportModal').classList.add('show');
+                document.getElementById('overlay').classList.add('show');
+            }
+
+            generateThemeCSS() {
+                return `:root {
+    --primary-color: ${this.customColors.primary};
+    --secondary-color: ${this.customColors.secondary};
+    --background-gradient: linear-gradient(135deg, ${this.customColors.background} 0%, ${this.customColors.secondary} 100%);
+    --text-color: ${this.customColors.text};
+    --border-color: ${this.customColors.border};
+}`;
+            }
+
+            randomTheme() {
+                const themeKeys = Object.keys(this.themes);
+                const randomKey = themeKeys[Math.floor(Math.random() * themeKeys.length)];
+                this.switchTheme(randomKey);
+            }
+
+            resetTheme() {
+                this.switchTheme('modern');
+                this.showNotification('主题已重置为默认', 'info');
+            }
+
+            saveTheme(theme) {
+                localStorage.setItem('selectedTheme', theme);
+                localStorage.setItem('themeTimestamp', Date.now());
+            }
+
+            loadSavedTheme() {
+                const savedTheme = localStorage.getItem('selectedTheme');
+                if (savedTheme && this.themes[savedTheme]) {
+                    this.switchTheme(savedTheme);
+                }
+            }
+
+            saveCustomColors() {
+                localStorage.setItem('customColors', JSON.stringify(this.customColors));
+            }
+
+            loadCustomColors() {
+                const saved = localStorage.getItem('customColors');
+                if (saved) {
+                    this.customColors = JSON.parse(saved);
+                    document.getElementById('primaryColor').value = this.customColors.primary;
+                    document.getElementById('secondaryColor').value = this.customColors.secondary;
+                    document.getElementById('backgroundColor').value = this.customColors.background;
+                    document.getElementById('textColor').value = this.customColors.text;
+                    document.getElementById('borderColor').value = this.customColors.border;
+                }
+            }
+
+            showNotification(message, type = 'info') {
+                const notification = document.createElement('div');
+                const colors = {
+                    success: '#4CAF50',
+                    error: '#F44336',
+                    warning: '#FF9800',
+                    info: '#2196F3'
+                };
+
+                notification.style.cssText = `
+                    position: fixed;
+                    top: 20px;
+                    right: 20px;
+                    background: ${colors[type] || colors.info};
+                    color: white;
+                    padding: 15px 20px;
+                    border-radius: 10px;
+                    box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+                    z-index: 10000;
+                    max-width: 300px;
+                    font-size: 14px;
+                    transform: translateX(100%);
+                    transition: all 0.3s ease;
+                    cursor: pointer;
+                `;
+                notification.innerHTML = message;
+
+                document.body.appendChild(notification);
+                this.notifications.push(notification);
+
+                // Force reflow to ensure transition works
+                notification.offsetHeight;
+
+                setTimeout(() => {
+                    notification.style.transform = 'translateX(0)';
+                }, 10);
+
+                const removeNotification = () => {
+                    if (notification.parentNode) {
+                        notification.style.transform = 'translateX(100%)';
+                        setTimeout(() => {
+                            if (notification.parentNode) {
+                                notification.parentNode.removeChild(notification);
+                                // Remove from tracking array
+                                const index = this.notifications.indexOf(notification);
+                                if (index > -1) {
+                                    this.notifications.splice(index, 1);
+                                }
+                            }
+                        }, 300);
+                    }
+                };
+
+                setTimeout(removeNotification, 3000);
+
+                // Allow manual dismissal by clicking
+                notification.addEventListener('click', removeNotification);
+            }
+
+            // Clean up method to prevent memory leaks
+            cleanup() {
+                // Clear notifications
+                this.notifications.forEach(notification => {
+                    if (notification.parentNode) {
+                        notification.parentNode.removeChild(notification);
+                    }
+                });
+                this.notifications = [];
+
+                // Clear event listeners if needed
+                this.eventListeners.forEach(({ element, event, handler }) => {
+                    element.removeEventListener(event, handler);
+                });
+                this.eventListeners = [];
+            }
+
+            // Helper method to add tracked event listeners
+            addEventListenerTracked(element, event, handler) {
+                element.addEventListener(event, handler);
+                this.eventListeners.push({ element, event, handler });
+            }
+
+            // 测试模式切换
+            toggleTestMode() {
+                this.testMode = !this.testMode;
+                const btn = document.getElementById('testMode');
+                const testArea = document.getElementById('testResultsArea');
+                const demoArea = document.getElementById('demoArea');
+
+                if (this.testMode) {
+                    btn.textContent = '🧪 退出测试';
+                    btn.classList.add('active');
+                    testArea.style.display = 'block';
+                    demoArea.style.display = 'none';
+                    this.showNotification('测试模式已启用', 'info');
+                } else {
+                    btn.textContent = '🧪 测试模式';
+                    btn.classList.remove('active');
+                    testArea.style.display = 'none';
+                    demoArea.style.display = 'block';
+                    this.showNotification('测试模式已关闭', 'info');
+                }
+            }
+
+            // 测试功能方法
+            logTest(message, type = 'info') {
+                const timestamp = new Date().toLocaleTimeString();
+                const logEntry = document.createElement('div');
+                logEntry.innerHTML = `[${timestamp}] ${message}`;
+                document.getElementById('testLog').appendChild(logEntry);
+                logEntry.scrollIntoView({ behavior: 'smooth' });
+            }
+
+            addTestResult(testName, passed, message = '') {
+                const result = {
+                    name: testName,
+                    passed: passed,
+                    message: message,
+                    timestamp: new Date().toISOString()
+                };
+
+                this.testResults.push(result);
+
+                const resultDiv = document.createElement('div');
+                resultDiv.className = `test-result ${passed ? 'test-pass' : 'test-fail'}`;
+                resultDiv.innerHTML = `
+                    <strong>${testName}</strong> ${passed ? '✅ PASS' : '❌ FAIL'}
+                    ${message ? `<br><small>${message}</small>` : ''}
+                `;
+
+                document.getElementById('testResults').appendChild(resultDiv);
+                this.logTest(`${testName}: ${passed ? 'PASSED' : 'FAILED'} ${message ? '- ' + message : ''}`, passed ? 'success' : 'error');
+            }
+
+            getCardColor(cardElement) {
+                const preview = cardElement.querySelector('.theme-preview');
+                if (!preview) return null;
+
+                const computedStyle = window.getComputedStyle(preview);
+                const backgroundColor = computedStyle.backgroundColor;
+
+                // Convert rgb to hex for easier comparison
+                const rgb = backgroundColor.match(/\d+/g);
+                if (rgb) {
+                    const hex = '#' + rgb.map(x => {
+                        const hex = parseInt(x).toString(16);
+                        return hex.length === 1 ? '0' + hex : hex;
+                    }).join('');
+                    return hex;
+                }
+                return backgroundColor;
+            }
+
+            getCSSVariables() {
+                const root = document.documentElement;
+                return {
+                    '--primary-color': getComputedStyle(root).getPropertyValue('--primary-color').trim(),
+                    '--secondary-color': getComputedStyle(root).getPropertyValue('--secondary-color').trim(),
+                    '--card-background': getComputedStyle(root).getPropertyValue('--card-background').trim(),
+                    '--text-color': getComputedStyle(root).getPropertyValue('--text-color').trim(),
+                    '--border-color': getComputedStyle(root).getPropertyValue('--border-color').trim()
+                };
+            }
+
+            setCSSVariables(variables) {
+                const root = document.documentElement;
+                for (const [varName, value] of Object.entries(variables)) {
+                    root.style.setProperty(varName, value);
+                }
+            }
+
+            // 主题卡片隔离测试
+            async testThemeCardIsolation() {
+                try {
+                    this.logTest('=== 测试主题卡片隔离 ===');
+
+                    // 获取原始颜色
+                    const themeCards = document.querySelectorAll('.theme-card');
+                    const originalColors = {};
+
+                    themeCards.forEach((card, index) => {
+                        const color = this.getCardColor(card);
+                        if (color) {
+                            originalColors[index] = color;
+                            this.logTest(`原始卡片 ${index + 1} 颜色: ${color}`);
+                        }
+                    });
+
+                    if (Object.keys(originalColors).length === 0) {
+                        return this.addTestResult('主题卡片隔离', false, '未找到主题卡片进行测试');
+                    }
+
+                    // 获取原始CSS变量
+                    this.originalVariables = this.getCSSVariables();
+                    this.logTest('原始CSS变量已保存');
+
+                    // 模拟应用不同主题
+                    const testThemeVariables = {
+                        '--primary-color': '#FF0000',
+                        '--secondary-color': '#00FF00',
+                        '--card-background': '#0000FF',
+                        '--text-color': '#FFFF00',
+                        '--border-color': '#FF00FF'
+                    };
+
+                    this.setCSSVariables(testThemeVariables);
+                    this.logTest('应用测试主题变量 (红、绿、蓝、黄、洋红)', 'warning');
+
+                    return new Promise((resolve) => {
+                        setTimeout(() => {
+                            try {
+                                let allTestsPassed = true;
+
+                                themeCards.forEach((card, index) => {
+                                    const currentColor = this.getCardColor(card);
+                                    if (currentColor) {
+                                        this.logTest(`当前卡片 ${index + 1} 颜色: ${currentColor}`);
+
+                                        if (currentColor !== originalColors[index]) {
+                                            allTestsPassed = false;
+                                            this.logTest(`❌ 卡片 ${index + 1} 颜色从 ${originalColors[index]} 变为 ${currentColor}`, 'error');
+                                        } else {
+                                            this.logTest(`✅ 卡片 ${index + 1} 颜色保持: ${currentColor}`);
+                                        }
+                                    }
+                                });
+
+                                // 恢复原始变量
+                                this.setCSSVariables(this.originalVariables);
+                                this.logTest('恢复原始CSS变量');
+
+                                if (allTestsPassed) {
+                                    resolve(this.addTestResult('主题卡片隔离', true, '所有主题卡片保持了原始颜色'));
+                                } else {
+                                    resolve(this.addTestResult('主题卡片隔离', false, '部分主题卡片受到全局CSS变量变化的影响'));
+                                }
+                            } catch (error) {
+                                this.logTest(`测试执行错误: ${error.message}`, 'error');
+                                resolve(this.addTestResult('主题卡片隔离', false, `测试执行失败: ${error.message}`));
+                            }
+                        }, 100);
+                    });
+                } catch (error) {
+                    this.logTest(`测试初始化错误: ${error.message}`, 'error');
+                    return this.addTestResult('主题卡片隔离', false, `测试初始化失败: ${error.message}`);
+                }
+            }
+
+            // CSS变量隔离测试
+            async testCSSVariableIsolation() {
+                try {
+                    this.logTest('=== 测试CSS变量隔离 ===');
+
+                    const root = document.documentElement;
+                    const originalVariables = this.getCSSVariables();
+
+                    this.logTest('原始CSS变量:', 'info');
+                    Object.entries(originalVariables).forEach(([varName, value]) => {
+                        this.logTest(`  ${varName}: ${value}`);
+                    });
+
+                    // 测试CSS变量修改是否影响主题卡片
+                    const testVariables = {
+                        '--primary-color': '#8B4513',
+                        '--secondary-color': '#D2691E',
+                        '--card-background': 'rgba(255, 248, 220, 0.95)',
+                        '--text-color': '#4A4A4A',
+                        '--border-color': '#DEB887'
+                    };
+
+                    this.setCSSVariables(testVariables);
+                    this.logTest('应用优雅主题变量', 'warning');
+
+                    return new Promise((resolve) => {
+                        setTimeout(() => {
+                            try {
+                                const modifiedVariables = this.getCSSVariables();
+
+                                this.logTest('修改后的CSS变量:', 'info');
+                                Object.entries(modifiedVariables).forEach(([varName, value]) => {
+                                    this.logTest(`  ${varName}: ${value}`);
+                                });
+
+                                // 检查主题卡片是否仍保持原始样式
+                                const themeCards = document.querySelectorAll('.theme-card');
+                                let cardsIsolated = true;
+
+                                themeCards.forEach((card, index) => {
+                                    const computedStyle = window.getComputedStyle(card);
+                                    const backgroundColor = computedStyle.backgroundColor;
+
+                                    this.logTest(`主题卡片 ${index + 1} 背景: ${backgroundColor}`);
+
+                                    // 主题卡片应该有白色/浅色背景，不受全局变量影响
+                                    if (!backgroundColor.includes('255') && !backgroundColor.includes('rgba(255, 255, 255')) {
+                                        cardsIsolated = false;
+                                        this.logTest(`❌ 主题卡片 ${index + 1} 背景受全局变量影响: ${backgroundColor}`, 'error');
+                                    } else {
+                                        this.logTest(`✅ 主题卡片 ${index + 1} 背景保持`);
+                                    }
+                                });
+
+                                // 恢复原始变量
+                                this.setCSSVariables(originalVariables);
+
+                                if (cardsIsolated) {
+                                    resolve(this.addTestResult('CSS变量隔离', true, '主题卡片与全局CSS变量正确隔离'));
+                                } else {
+                                    resolve(this.addTestResult('CSS变量隔离', false, '主题卡片仍受全局CSS变量影响'));
+                                }
+                            } catch (error) {
+                                this.logTest(`测试执行错误: ${error.message}`, 'error');
+                                resolve(this.addTestResult('CSS变量隔离', false, `测试执行失败: ${error.message}`));
+                            }
+                        }, 100);
+                    });
+                } catch (error) {
+                    this.logTest(`测试初始化错误: ${error.message}`, 'error');
+                    return this.addTestResult('CSS变量隔离', false, `测试初始化失败: ${error.message}`);
+                }
+            }
+
+            // 运行所有测试
+            async runAllTests() {
+                try {
+                    this.logTest('🚀 开始综合主题隔离测试...');
+                    this.testResults = [];
+                    document.getElementById('testResults').innerHTML = '';
+                    document.getElementById('testLog').innerHTML = '';
+
+                    const tests = [
+                        () => this.testCSSVariableIsolation(),
+                        () => this.testThemeCardIsolation()
+                    ];
+
+                    for (const test of tests) {
+                        try {
+                            await test();
+                            // 测试间添加延迟
+                            await new Promise(resolve => setTimeout(resolve, 500));
+                        } catch (error) {
+                            this.logTest(`测试执行错误: ${error.message}`, 'error');
+                            this.addTestResult('测试执行', false, `运行测试时出错: ${error.message}`);
+                        }
+                    }
+
+                    // 最终总结
+                    const passedTests = this.testResults.filter(r => r.passed).length;
+                    const totalTests = this.testResults.length;
+
+                    this.logTest('📊 测试总结:', 'info');
+                    this.logTest(`  总测试数: ${totalTests}`);
+                    this.logTest(`  通过测试: ${passedTests}`);
+                    this.logTest(`  失败测试: ${totalTests - passedTests}`);
+                    if (totalTests > 0) {
+                        this.logTest(`  成功率: ${Math.round((passedTests / totalTests) * 100)}%`);
+                    }
+
+                    const finalResult = this.addTestResult(
+                        '整体主题隔离修复',
+                        passedTests === totalTests,
+                        `${passedTests}/${totalTests} 测试通过 - 主题隔离修复${passedTests === totalTests ? '正常工作' : '需要改进'}`
+                    );
+
+                    return {
+                        passed: passedTests === totalTests,
+                        results: this.testResults,
+                        summary: {
+                            total: totalTests,
+                            passed: passedTests,
+                            failed: totalTests - passedTests,
+                            successRate: totalTests > 0 ? Math.round((passedTests / totalTests) * 100) : 0
+                        }
+                    };
+                } catch (error) {
+                    this.logTest(`测试套件执行错误: ${error.message}`, 'error');
+                    this.addTestResult('测试套件', false, `测试套件执行失败: ${error.message}`);
+                    return {
+                        passed: false,
+                        error: error.message,
+                        results: this.testResults
+                    };
+                }
+            }
+        }
+
+        // 全局函数
+        function previewTheme(theme) {
+            if (window.themeSelector) {
+                window.themeSelector.showNotification(`预览${window.themeSelector.themes[theme].name}主题`, 'info');
+            }
+        }
+
+        function applyTheme(theme) {
+            if (window.themeSelector) {
+                window.themeSelector.switchTheme(theme);
+            }
+        }
+
+        function showNotification(message) {
+            if (window.themeSelector) {
+                window.themeSelector.showNotification(message, 'info');
+            }
+        }
+
+        function closeCustomPanel() {
+            if (window.themeSelector) {
+                window.themeSelector.closeCustomPanel();
+            }
+        }
+
+        function resetCustomColors() {
+            if (window.themeSelector) {
+                window.themeSelector.resetCustomColors();
+            }
+        }
+
+        function applyCustomTheme() {
+            if (window.themeSelector) {
+                window.themeSelector.applyCustomTheme();
+            }
+        }
+
+        function closeExportModal() {
+            document.getElementById('exportModal').classList.remove('show');
+            document.getElementById('overlay').classList.remove('show');
+        }
+
+        function copyThemeCode() {
+            const code = document.getElementById('exportCode').textContent;
+            navigator.clipboard.writeText(code).then(() => {
+                if (window.themeSelector) {
+                    window.themeSelector.showNotification('代码已复制到剪贴板', 'success');
+                }
+            });
+        }
+
+        function downloadThemeCode() {
+            const code = document.getElementById('exportCode').textContent;
+            const blob = new Blob([code], { type: 'application/json' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `custom-theme-${Date.now()}.json`;
+            a.click();
+            URL.revokeObjectURL(url);
+
+            if (window.themeSelector) {
+                window.themeSelector.showNotification('主题文件已下载', 'success');
+            }
+        }
+
+        // 测试相关全局函数
+        function runThemeIsolationTest() {
+            if (window.themeSelector) {
+                window.themeSelector.testThemeCardIsolation();
+            }
+        }
+
+        function runCSSVariableTest() {
+            if (window.themeSelector) {
+                window.themeSelector.testCSSVariableIsolation();
+            }
+        }
+
+        function runAllTests() {
+            if (window.themeSelector) {
+                window.themeSelector.runAllTests();
+            }
+        }
+
+        function clearTestResults() {
+            if (window.themeSelector) {
+                window.themeSelector.testResults = [];
+                document.getElementById('testResults').innerHTML = '';
+                document.getElementById('testLog').innerHTML = '';
+                window.themeSelector.showNotification('测试结果已清除', 'info');
+            }
+        }
+
+        // 初始化主题选择器
+        document.addEventListener('DOMContentLoaded', () => {
+            window.themeSelector = new ThemeSelector();
+        });
+    </script>
+</body>
+</html>
